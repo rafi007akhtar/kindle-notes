@@ -16,7 +16,7 @@ import { DocumentPickerResult } from "expo-document-picker";
 import NotesViewer from "./components/NotesViewer";
 import Loader from "./components/Loader";
 
-export default function App() {
+function POCViewer() {
   const [fileContents, setFileContents] = useAtom(fileContentsAtom);
   const [bookTitles] = useAtom(bookTitlesAtom);
   const [currentlyParsing] = useAtom(currentlyParsingAtom);
@@ -94,6 +94,10 @@ export default function App() {
       <StatusBar style="auto" />
     </View>
   );
+}
+
+export default function App() {
+  return <POCViewer />;
 }
 
 const styles = StyleSheet.create({
