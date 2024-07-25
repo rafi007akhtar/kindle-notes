@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "kindle-notes",
+    "name": "Kindle Notes",
     "slug": "kindle-notes",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,10 +18,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.rafi007akhtar.kindlenotes"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [["expo-document-picker"]],
+    "extra": {
+      "eas": {
+        "projectId": "4385e2d2-511b-4f75-aedb-3ba1a8b75a6a"
+      }
     }
   }
 }
