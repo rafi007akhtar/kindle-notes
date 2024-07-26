@@ -1,103 +1,42 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Button, Alert } from "react-native";
+import { StyleSheet } from "react-native";
 
-import { useAtom } from "jotai";
-import {
-  bookTitlesAtom,
-  currentlyParsingAtom,
-  fileContentsAtom,
-} from "./data/fileData";
-import FileParser from "./components/FileParser";
 // import NotesCreator from "./components/NotesCreator";
 
-import * as FileSystem from "expo-file-system";
-import * as DocumentPicker from "expo-document-picker";
-import { DocumentPickerResult } from "expo-document-picker";
 import NotesViewer from "./components/NotesViewer";
-import Loader from "./components/Loader";
-
-function POCViewer() {
-  const [fileContents, setFileContents] = useAtom(fileContentsAtom);
-  const [bookTitles] = useAtom(bookTitlesAtom);
-  const [currentlyParsing] = useAtom(currentlyParsingAtom);
-
-  async function getFileDetails() {
-    let file: DocumentPickerResult | undefined, err;
-    try {
-      file = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-        type: "text/*",
-      });
-    } catch (e) {
-      err = e;
-    }
-    return [file, err];
-  }
-
-  async function getFileContents(file: DocumentPickerResult) {
-    let fileContents, err;
-    if (!file) {
-      err = "Error: invalid file.";
-      return [fileContents, err];
-    }
-
-    try {
-      const fileUri = file?.assets ? file.assets[0].uri : "";
-      fileContents = await FileSystem.readAsStringAsync(fileUri);
-    } catch (e) {
-      err = e;
-    }
-
-    return [fileContents, err];
-  }
-
-  async function selectFile() {
-    const [file, err1] = await getFileDetails();
-    if (err1) {
-      console.log("err1:", err1);
-      Alert.alert("Error", err1.toString ? err1.toString() : "Error 1");
-      return;
-    }
-
-    const [contents, err2] = await getFileContents(
-      file as DocumentPickerResult
-    );
-    if (err2) {
-      console.log("err2:", err2);
-      Alert.alert("Error", err2.toString ? err2.toString() : "Error 2");
-      return;
-    }
-    setFileContents(contents as string);
-  }
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.btnsContainer}>
-        <View>
-          <Button title="Select file" onPress={selectFile}></Button>
-        </View>
-        {!!fileContents && (
-          <View style={styles.btnContainer}>
-            <FileParser />
-          </View>
-        )}
-        {/* {!!bookTitles?.length && (
-          <View style={styles.btnContainer}>
-            <NotesCreator />
-          </View>
-        )} */}
-      </View>
-
-      {currentlyParsing && <Loader />}
-      {!!bookTitles?.length && <NotesViewer />}
-
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import {
+  PaperProvider,
+  MD3LightTheme as DefaultTheme,
+  BottomNavigation,
+} from "react-native-paper";
+import { useState } from "react";
+import SetupRoute from "./screens/SetupRoute";
+import { BaseRoute } from "react-native-paper/lib/typescript/components/BottomNavigation/BottomNavigation";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  return <POCViewer />;
+  const [index, setIndex] = useState(0);
+  const [routes] = useState<BaseRoute[]>([
+    { key: "setup", title: "Setup", focusedIcon: "tune" },
+    { key: "viewNotes", title: "View Notes", focusedIcon: "note-multiple" },
+  ]);
+
+  const renderScene = BottomNavigation.SceneMap({
+    setup: SetupRoute,
+    viewNotes: NotesViewer,
+  });
+
+  return (
+    <>
+      <StatusBar style="dark" />
+      <PaperProvider theme={DefaultTheme}>
+        <BottomNavigation
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          navigationState={{ index, routes }}
+        />
+      </PaperProvider>
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
