@@ -3,8 +3,8 @@ import { HighlightInfo } from "../models/common.model";
 
 export default function Note(highlightInfo: HighlightInfo) {
   const { highlightedText, highlightedType } = highlightInfo;
-  const preSpace = highlightedType === "NOTE" ? "\t\t" : "";
-  const bullet = highlightedType === "NOTE" ? "○" : "•";
+  const preSpace = highlightedType === "NOTE" ? "\t" : "";
+  const bullet = highlightedType === "NOTE" ? "○" : "";
 
   return (
     <View style={styles.noteContainer}>
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   noteContainer: {
     flexDirection: "row",
     textAlign: "justify",
-    marginVertical: 2,
+    marginVertical: -16,
   },
   text: {
     textAlign: "justify",
