@@ -1,7 +1,8 @@
 import { useAtom } from "jotai";
 import { bookHighlightsAtom } from "../data/fileData";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import Note from "./Note";
+import { List, Text } from "react-native-paper";
 
 function Separator() {
   return (
@@ -16,36 +17,71 @@ export default function NotesViewer() {
   const bookHighlightsJSX = [];
   let ind1 = 0,
     ind2 = 0,
-    ind3 = 0;
+    ind3 = 0,
+    ind4 = 0;
   for (let title in bookHighlights) {
     const highlightsInfo = bookHighlights[title];
     const notes = [];
     for (let highlightInfo of highlightsInfo) {
-      const note = <Note {...highlightInfo} key={ind1++} />;
+      const n = <Note {...highlightInfo} key={ind1++} />;
+      const note = <List.Item title="" description={() => n} />;
       notes.push(note);
     }
     const bookHighlight = (
-      <View key={ind2++}>
-        <Text style={styles.title}>{title}</Text>
-        {notes}
-      </View>
+      <List.Section key={ind2++}>
+        {/* <Text>{title}</Text>
+        {notes} */}
+        <List.Accordion title={title}>{notes}</List.Accordion>
+      </List.Section>
     );
+    bookHighlight.key = `${ind4++}`;
     bookHighlightsJSX.push(bookHighlight);
     bookHighlightsJSX.push(<Separator key={`sep-${ind3++}`} />);
   }
 
-  return <ScrollView style={styles.container}>{bookHighlightsJSX}</ScrollView>;
+  let content = (
+    <View style={styles.placeholderText}>
+      <Text variant="bodyLarge">Notes created will show up here.</Text>
+    </View>
+  );
+  if (bookHighlightsJSX.length) {
+    content = (
+      <View style={styles.container}>
+        <Text variant="headlineMedium">Extracted Notes & Highlights</Text>
+        <Text style={styles.subtitle}>
+          The following notes, grouped by their containing books, were extracted
+          from the Kindle notes file.
+        </Text>
+        <FlatList
+          style={styles.list}
+          data={bookHighlightsJSX}
+          renderItem={(item) => item.item}
+          keyExtractor={(item, ind) => `${ind}`}
+        />
+      </View>
+    );
+  }
+
+  return content;
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
+  placeholderText: {
+    justifyContent: "center",
+    height: "100%",
+    alignItems: "center",
+  },
+  list: {
+    marginBottom: 80,
+  },
+  subtitle: {
+    marginVertical: 10,
   },
   container: {
-    marginLeft: 10,
-    marginRight: 20,
-    textAlign: "justify",
+    // marginLeft: 10,
+    // marginRight: 20,
+    margin: 16,
+    marginTop: 50,
   },
   separator: {
     borderColor: "black",
