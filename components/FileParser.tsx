@@ -5,10 +5,10 @@ import {
   currentlyParsingAtom,
   fileContentsAtom,
 } from "../data/fileData";
-import { Button } from "react-native";
 import { appConstants } from "../constants/common.constants";
 import { arrayStartsWith, cleanLine } from "../utils/formatting.util";
 import { BookHighlights, HighlightTypes } from "../models/common.model";
+import { Card, Text, Button } from "react-native-paper";
 
 export default function FileParser() {
   const [fileContents] = useAtom(fileContentsAtom);
@@ -76,13 +76,25 @@ export default function FileParser() {
 
   return (
     <>
-      <Button
-        title="Parse File"
-        onPress={() => {
-          setCurrentlyParsing(true);
-          parseFile(fileContents);
-        }}
-      />
+      <Card>
+        <Card.Title title="Make Notes" titleVariant="titleLarge" />
+        <Card.Content>
+          <Text>
+            File is successfully uploaded! Now click on the below button to
+            create notes from your file.
+          </Text>
+        </Card.Content>
+        <Card.Actions>
+          <Button
+            onPress={() => {
+              parseFile(fileContents);
+            }}
+            icon="note-plus"
+          >
+            Create Notes
+          </Button>
+        </Card.Actions>
+      </Card>
     </>
   );
 }
