@@ -12,6 +12,8 @@ import {
 import * as FileSystem from "expo-file-system";
 import * as DocumentPicker from "expo-document-picker";
 import FileParser from "../components/FileParser";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { clearAllTables, kindleNotesDB, schema } from "../utils/db.util";
 
 function UploadCard(props: {
   onPress: ((e: GestureResponderEvent) => void) | undefined;
@@ -60,8 +62,10 @@ function DoneCard(props: {
 export default function SetupRoute() {
   const [fileContents, setFileContents] = useAtom(fileContentsAtom);
   const [bookTitles, setBookTitles] = useAtom(bookTitlesAtom);
-  const [_, setBookHighlights] = useAtom(bookHighlightsAtom);
+  const [bookHighlights, setBookHighlights] = useAtom(bookHighlightsAtom);
   const [currentlyParsing] = useAtom(currentlyParsingAtom);
+
+  let drizzleDB = drizzle(kindleNotesDB);
 
   async function getFileDetails() {
     let file: DocumentPickerResult | undefined, err;
@@ -116,9 +120,23 @@ export default function SetupRoute() {
       return;
     }
     setFileContents(contents as string);
+    // console.log({ contents });
+    if (contents) {
+      drizzleDB = drizzle(kindleNotesDB);
+      try {
+        const deleteResult = await drizzleDB.delete(schema.clippingsFile);
+        const returnResult = await drizzleDB
+          .insert(schema.clippingsFile)
+          .values({ fileContents: contents as string });
+        console.log({ returnResult });
+      } catch (e) {
+        console.error("something went wrong with upload on db:", e);
+      }
+    }
   }
 
   function resetData() {
+    clearAllTables();
     setFileContents("");
     setBookTitles([]);
     setBookHighlights({});
@@ -133,7 +151,9 @@ export default function SetupRoute() {
       <View style={styles.cardsContainer}>
         <UploadCard onPress={selectFile} />
         {!!fileContents && <FileParser />}
-        {!!bookTitles?.length && <DoneCard onPress={resetData} />}
+        {!!Object.keys(bookHighlights)?.length && (
+          <DoneCard onPress={resetData} />
+        )}
       </View>
     </View>
   );
