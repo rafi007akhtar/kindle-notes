@@ -11,3 +11,9 @@ export type HighlightsInfo = Array<HighlightInfo>;
 export interface BookHighlights {
   [key: string]: HighlightsInfo;
 }
+
+export interface NormalizedHighlight extends HighlightInfo {
+  bookTitle: string;
+}
+
+export type NormalizedHighlights = Array<NormalizedHighlight>;
