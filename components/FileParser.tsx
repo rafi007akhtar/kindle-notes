@@ -9,11 +9,15 @@ import { appConstants } from "../constants/common.constants";
 import { arrayStartsWith, cleanLine } from "../utils/formatting.util";
 import { BookHighlights, HighlightTypes } from "../models/common.model";
 import { Card, Text, Button } from "react-native-paper";
+import { useEffect } from "react";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { kindleNotesDB, schema } from "../utils/db.util";
+import { convertHighlightsToArray } from "../utils/highlights.util";
 
 export default function FileParser() {
   const [fileContents] = useAtom(fileContentsAtom);
   const [_, setBookTitles] = useAtom(bookTitlesAtom);
-  const [__, setBookHighlights] = useAtom(bookHighlightsAtom);
+  const [bh, setBookHighlights] = useAtom(bookHighlightsAtom);
   const [___, setCurrentlyParsing] = useAtom(currentlyParsingAtom);
 
   let bookTitles: string[] = [],
@@ -23,6 +27,30 @@ export default function FileParser() {
   let highlightType: HighlightTypes = "HIGHLIGHT";
   let currentTitle = "";
   let brandNewHighlight = false; // will be used for new notes
+
+  useEffect(() => {
+    (async () => {
+      const drizzleDB = drizzle(kindleNotesDB);
+      const highlightArray = convertHighlightsToArray(bh);
+      // console.log({ highlightArray });
+      if (!highlightArray?.length) {
+        return;
+      }
+
+      try {
+        await drizzleDB.delete(schema.bookHighlights);
+        const postHighlightInsert = await drizzleDB
+          .insert(schema.bookHighlights)
+          .values(highlightArray);
+        console.log({ postHighlightInsert });
+      } catch (e) {
+        console.error(
+          "An error occured while inserting highlights in the DB:",
+          e
+        );
+      }
+    })();
+  }, [kindleNotesDB, bh]);
 
   function parseFile(file: string | undefined) {
     if (!file) {
