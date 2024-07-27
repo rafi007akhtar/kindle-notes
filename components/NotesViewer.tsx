@@ -3,6 +3,7 @@ import { bookHighlightsAtom } from "../data/fileData";
 import { FlatList, StyleSheet, View } from "react-native";
 import Note from "./Note";
 import { List, Text } from "react-native-paper";
+import { useEffect, useState } from "react";
 
 function Separator() {
   return (
@@ -13,37 +14,43 @@ function Separator() {
 }
 
 export default function NotesViewer() {
-  const [bookHighlights] = useAtom(bookHighlightsAtom);
-  const bookHighlightsJSX = [];
+  const [bookHighlights, setBookHighlights] = useAtom(bookHighlightsAtom);
+  const [bookHighlightsJSX, setBookHighlightsJSX] = useState<any[]>([]);
   let ind1 = 0,
     ind2 = 0,
     ind3 = 0,
     ind4 = 0;
-  for (let title in bookHighlights) {
-    const highlightsInfo = bookHighlights[title];
-    const notes = [];
-    for (let highlightInfo of highlightsInfo) {
-      const n = <Note {...highlightInfo} key={ind1++} />;
-      const note = <List.Item title="" description={() => n} />;
-      notes.push(note);
+
+  useEffect(() => {
+    setBookHighlightsJSX([]);
+    for (let title in bookHighlights) {
+      const highlightsInfo = bookHighlights[title];
+      const notes = [];
+      for (let highlightInfo of highlightsInfo) {
+        const n = <Note {...highlightInfo} />;
+        const note = <List.Item title="" description={() => n} key={ind1++} />;
+        notes.push(note);
+      }
+      const bookHighlight = (
+        <List.Section key={ind2++}>
+          <List.Accordion title={title}>{notes}</List.Accordion>
+        </List.Section>
+      );
+      bookHighlight.key = `${ind4++}`;
+      setBookHighlightsJSX((curr) => [
+        ...curr,
+        bookHighlight,
+        <Separator key={`sep-${ind3++}`} />,
+      ]);
     }
-    const bookHighlight = (
-      <List.Section key={ind2++}>
-        {/* <Text>{title}</Text>
-        {notes} */}
-        <List.Accordion title={title}>{notes}</List.Accordion>
-      </List.Section>
-    );
-    bookHighlight.key = `${ind4++}`;
-    bookHighlightsJSX.push(bookHighlight);
-    bookHighlightsJSX.push(<Separator key={`sep-${ind3++}`} />);
-  }
+  }, [bookHighlights]);
 
   let content = (
     <View style={styles.placeholderText}>
       <Text variant="bodyLarge">Notes created will show up here.</Text>
     </View>
   );
+
   if (bookHighlightsJSX.length) {
     content = (
       <View style={styles.container}>
