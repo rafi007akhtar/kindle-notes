@@ -10,7 +10,9 @@ export default function Note(highlightInfo: HighlightInfo) {
     <View style={styles.noteContainer}>
       <Text>{preSpace}</Text>
       <Text>{bullet} </Text>
-      <Text style={styles.text}>{highlightedText}</Text>
+      <Text selectable={true} style={styles.text}>
+        {highlightedText}
+      </Text>
     </View>
   );
 }
