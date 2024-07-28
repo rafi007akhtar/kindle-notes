@@ -2,8 +2,8 @@ import { useAtom } from "jotai";
 import { bookHighlightsAtom } from "../data/fileData";
 import { FlatList, StyleSheet, View } from "react-native";
 import Note from "./Note";
-import { List, Text } from "react-native-paper";
-import { useEffect, useState } from "react";
+import { FAB, List, Text, TextInput } from "react-native-paper";
+import { useEffect, useRef, useState } from "react";
 
 function Separator() {
   return (
@@ -16,6 +16,12 @@ function Separator() {
 export default function NotesViewer() {
   const [bookHighlights, setBookHighlights] = useAtom(bookHighlightsAtom);
   const [bookHighlightsJSX, setBookHighlightsJSX] = useState<any[]>([]);
+  const [searchText, setSearchText] = useState<string>("a");
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef<any>(null);
+  const [fabIcon, setFabIcon] = useState<"magnify" | "check">("magnify");
+  const [showFab, setShowFab] = useState(true);
+
   let ind1 = 0,
     ind2 = 0,
     ind3 = 0,
@@ -27,9 +33,18 @@ export default function NotesViewer() {
       const highlightsInfo = bookHighlights[title];
       const notes = [];
       for (let highlightInfo of highlightsInfo) {
-        const n = <Note {...highlightInfo} />;
-        const note = <List.Item title="" description={() => n} key={ind1++} />;
-        notes.push(note);
+        if (
+          !searchText.length ||
+          highlightInfo.highlightedText
+            .toLowerCase()
+            .includes(searchText.toLowerCase())
+        ) {
+          const n = <Note {...highlightInfo} />;
+          const note = (
+            <List.Item title="" description={() => n} key={ind1++} />
+          );
+          notes.push(note);
+        }
       }
       const bookHighlight = (
         <List.Section key={ind2++}>
@@ -43,7 +58,22 @@ export default function NotesViewer() {
         <Separator key={`sep-${ind3++}`} />,
       ]);
     }
-  }, [bookHighlights]);
+  }, [bookHighlights, searchText]);
+
+  function fabToggle() {
+    setShowSearch((curr) => !curr);
+    if (showSearch) {
+      setFabIcon("magnify");
+      const interval = setInterval(() => {
+        searchRef.current?.forceFocus();
+        if (searchRef.current?.isFocused()) {
+          clearInterval(interval);
+        }
+      }, 500);
+    } else {
+      setFabIcon("check");
+    }
+  }
 
   let content = (
     <View style={styles.placeholderText}>
@@ -54,16 +84,47 @@ export default function NotesViewer() {
   if (bookHighlightsJSX.length) {
     content = (
       <View style={styles.container}>
+        {showFab && (
+          <FAB
+            icon={fabIcon}
+            onPress={fabToggle}
+            size="medium"
+            variant="secondary"
+            style={styles.fab}
+          />
+        )}
         <Text variant="headlineMedium">Extracted Notes & Highlights</Text>
         <Text style={styles.subtitle}>
           The following notes, grouped by their containing books, were extracted
           from the Kindle notes file.
         </Text>
+        {showSearch && (
+          <TextInput
+            label="Search"
+            value={searchText}
+            style={styles.search}
+            onChangeText={(text) => setSearchText(text)}
+            ref={searchRef}
+            right={
+              <TextInput.Icon
+                icon="backspace"
+                onPress={() => setSearchText("")}
+              />
+            }
+          />
+        )}
         <FlatList
           style={styles.list}
           data={bookHighlightsJSX}
           renderItem={(item) => item.item}
           keyExtractor={(item, ind) => `${ind}`}
+          showsVerticalScrollIndicator={true}
+          onScrollBeginDrag={() => {
+            setShowFab(true);
+          }}
+          onEndReached={() => {
+            setShowFab(false);
+          }}
         />
       </View>
     );
@@ -81,12 +142,13 @@ const styles = StyleSheet.create({
   list: {
     marginBottom: 80,
   },
+  badge: {
+    paddingLeft: 10,
+  },
   subtitle: {
     marginVertical: 10,
   },
   container: {
-    // marginLeft: 10,
-    // marginRight: 20,
     margin: 16,
     marginTop: 50,
   },
@@ -97,5 +159,19 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 0.5,
     marginVertical: 10,
+  },
+  search: {
+    position: "absolute",
+    top: 0,
+    zIndex: 1,
+    width: "100%",
+  },
+  fab: {
+    position: "absolute",
+    borderRadius: 50,
+    margin: 16,
+    right: 0,
+    zIndex: 1,
+    top: "72%",
   },
 });
