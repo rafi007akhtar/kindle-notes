@@ -1,6 +1,6 @@
 # Kindle Notes
 
-To build the notes from this app, after setting up the JSON files, run this command.
+Project in React Native that builds an app that would import Kindle notes and show them in a readable format within the app.
 
 ## Pre-requisites
 
