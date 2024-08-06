@@ -139,3 +139,13 @@ This will upload the entire project to the EAS service and your build will be pu
 ## Build for iOS
 
 Due to lack of build / test machines (I use Windows / Android devices), I was not able to try this out. Please refer to [this video on YouTube](https://youtu.be/cs-zgHjt5RQ?si=IAdCiruDIXE2orVm) that describes in depth how this can app can be built for iOS.
+
+## Using the App
+
+One you have the app running on your smartphone, connect your Kindle with your phone. This will be a wired connection. You will need a cable that connects between your smartphone port and your Kindle port. For example, for connecting between Kindle Paperwhile and an Android mobile, you will need a USB C to USB C cable.
+
+Once connected, make sure you are able to access the Kindle storage on your phone.
+
+Then open the app, and click on the Upload button. Navigate to your Kindle drive and locate the "My Clippings.txt" file (it will probably be inside the `documents` folder). Select it.
+
+Once uploaded, click on the "Create Notes" button in the app. It might take a few seconds to create the notes, and then the notes should be availble in the "View Notes" tab on the bottom.
