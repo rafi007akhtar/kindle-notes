@@ -16,7 +16,7 @@ function Separator() {
 export default function NotesViewer() {
   const [bookHighlights, setBookHighlights] = useAtom(bookHighlightsAtom);
   const [bookHighlightsJSX, setBookHighlightsJSX] = useState<any[]>([]);
-  const [searchText, setSearchText] = useState<string>("a");
+  const [searchText, setSearchText] = useState<string>("");
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef<any>(null);
   const [fabIcon, setFabIcon] = useState<"magnify" | "check">("magnify");
