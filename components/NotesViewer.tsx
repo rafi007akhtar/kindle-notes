@@ -93,6 +93,7 @@ export default function NotesViewer() {
             style={styles.fab}
           />
         )}
+        {showSearch && <View style={styles.verticalSpace}></View>}
         <Text variant="headlineMedium">Extracted Notes & Highlights</Text>
         <Text style={styles.subtitle}>
           The following notes, grouped by their containing books, were extracted
@@ -173,5 +174,8 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1,
     top: "72%",
+  },
+  verticalSpace: {
+    marginTop: 20,
   },
 });
